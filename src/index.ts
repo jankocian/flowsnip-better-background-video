@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
           video.paused &&
             video.play().catch(() => {
               // If autoplay is blocked, wait for a click event
-              addClickEventListener();
+              addInteractionEventListener();
             });
         }
       });
@@ -71,14 +71,20 @@ document.addEventListener('DOMContentLoaded', function () {
     observer.observe(video);
 
     // If autoplay is blocked, play on user interaction
-    const addClickEventListener = () => {
-      const onClickPlayVideo = () => {
+    const addInteractionEventListener = () => {
+      const onInteractionPlayVideo = () => {
+        // Attempt to play the video
         video.paused && video.play();
-        document.removeEventListener('click', onClickPlayVideo);
+        // Remove all event listeners to prevent multiple triggers
+        ['click', 'touchstart', 'pointerdown'].forEach((eventType) => {
+          document.removeEventListener(eventType, onInteractionPlayVideo);
+        });
       };
 
-      // Listen for a click anywhere on the page (iOS only accepts clicks on the media element)
-      document.addEventListener('click', onClickPlayVideo);
+      // Listen for interaction events anywhere on the page (iOS only accepts clicks on the media element)
+      ['click', 'touchstart', 'pointerdown'].forEach((eventType) => {
+        document.addEventListener(eventType, onInteractionPlayVideo, { passive: true });
+      });
     };
   });
 });
