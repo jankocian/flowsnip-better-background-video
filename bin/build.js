@@ -4,9 +4,6 @@ import { join, sep } from 'path';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
 // Config output
 const BUILD_DIRECTORY = 'dist';
