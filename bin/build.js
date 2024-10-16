@@ -1,6 +1,9 @@
 import * as esbuild from 'esbuild';
 import { readdirSync } from 'fs';
 import { join, sep } from 'path';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Config output
 const BUILD_DIRECTORY = 'dist';
@@ -14,6 +17,54 @@ const LIVE_RELOAD = !PRODUCTION;
 const SERVE_PORT = 3000;
 const SERVE_ORIGIN = `http://localhost:${SERVE_PORT}`;
 
+// Plugin to generate package.json in the dist directory
+const generatePackageJsonPlugin = () => {
+  return {
+    name: 'generate-dist-package-json',
+    setup(build) {
+      build.onEnd(() => {
+        const __dirname = path.dirname(fileURLToPath(import.meta.url));
+        const rootDir = path.resolve(__dirname, '..');
+        const distDir = path.join(rootDir, BUILD_DIRECTORY);
+
+        // You will need to find a way to import or read your package.json since `require` is not available in ES modules
+        const packageJson = JSON.parse(fs.readFileSync(path.join(rootDir, 'package.json')));
+
+        // Modify the package.json as needed
+        delete packageJson.scripts;
+        delete packageJson.devDependencies;
+        delete packageJson.files;
+        delete packageJson.publishConfig;
+        packageJson.browser = 'index.js'; // Update as per your entry file
+
+        // Write the modified package.json to the dist directory
+        fs.writeFileSync(path.join(distDir, 'package.json'), JSON.stringify(packageJson, null, 2));
+      });
+    },
+  };
+};
+
+// Plugin to copy README.md to the dist directory
+const copyReadmePlugin = async () => {
+  return {
+    name: 'copy-readme-to-dist',
+    setup(build) {
+      build.onEnd(async () => {
+        const __dirname = path.dirname(fileURLToPath(import.meta.url));
+        const rootDir = path.resolve(__dirname, '..');
+        const distDir = path.join(rootDir, BUILD_DIRECTORY);
+
+        try {
+          await fs.copyFile(path.join(rootDir, 'README.md'), path.join(distDir, 'README.md'));
+          console.log('README.md copied to dist directory');
+        } catch (error) {
+          console.error('Error copying README.md:', error);
+        }
+      });
+    },
+  };
+};
+
 // Create context
 const context = await esbuild.context({
   bundle: true,
@@ -23,6 +74,7 @@ const context = await esbuild.context({
   sourcemap: !PRODUCTION,
   target: PRODUCTION ? 'es2020' : 'esnext',
   inject: LIVE_RELOAD ? ['./bin/live-reload.js'] : undefined,
+  plugins: [generatePackageJsonPlugin(), copyReadmePlugin()],
   define: {
     SERVE_ORIGIN: JSON.stringify(SERVE_ORIGIN),
   },
