@@ -1,5 +1,15 @@
 # @finsweet/developer-starter
 
+## 1.1.0
+
+### Minor Changes
+
+- 6070c29: Better touch device support
+
+### Patch Changes
+
+- 7bd5b54: Update lockfile to reflect new publishConfig
+
 ## 1.0.1
 
 ### Patch Changes
