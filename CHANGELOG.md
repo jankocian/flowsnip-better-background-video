@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.2
+
+### Patch Changes
+
+- ed4ecc8: Fix jsdelivr link
+
 ## 1.1.1
 
 ### Patch Changes
