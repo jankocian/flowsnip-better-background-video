@@ -4,6 +4,9 @@ import { join, sep } from 'path';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Config output
 const BUILD_DIRECTORY = 'dist';
@@ -45,21 +48,18 @@ const generatePackageJsonPlugin = () => {
 };
 
 // Plugin to copy README.md to the dist directory
-const copyReadmePlugin = async () => {
+const copyReadmePlugin = () => {
   return {
     name: 'copy-readme-to-dist',
     setup(build) {
-      build.onEnd(async () => {
+      build.onEnd(() => {
         const __dirname = path.dirname(fileURLToPath(import.meta.url));
         const rootDir = path.resolve(__dirname, '..');
         const distDir = path.join(rootDir, BUILD_DIRECTORY);
 
-        try {
-          await fs.copyFile(path.join(rootDir, 'README.md'), path.join(distDir, 'README.md'));
-          console.log('README.md copied to dist directory');
-        } catch (error) {
-          console.error('Error copying README.md:', error);
-        }
+        fs.copyFile(path.join(rootDir, 'README.md'), path.join(distDir, 'README.md'))
+          .then(() => console.log('README.md copied to dist directory'))
+          .catch((error) => console.error('Error copying README.md:', error));
       });
     },
   };
@@ -74,6 +74,7 @@ const context = await esbuild.context({
   sourcemap: !PRODUCTION,
   target: PRODUCTION ? 'es2020' : 'esnext',
   inject: LIVE_RELOAD ? ['./bin/live-reload.js'] : undefined,
+  plugins: [generatePackageJsonPlugin(), copyReadmePlugin()],
   plugins: [generatePackageJsonPlugin(), copyReadmePlugin()],
   define: {
     SERVE_ORIGIN: JSON.stringify(SERVE_ORIGIN),
