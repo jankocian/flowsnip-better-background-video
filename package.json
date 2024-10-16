@@ -1,6 +1,6 @@
 {
   "name": "@jankocian/flowsnip-better-background-video",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A better background video module for Webflow.",
   "homepage": "https://github.com/jankocian/flowsnip-better-background-video",
   "license": "ISC",
@@ -20,8 +20,8 @@
     "dist"
   ],
   "publishConfig": {
-		"directory": "./dist"
-	},
+    "directory": "./dist"
+  },
   "scripts": {
     "dev": "cross-env NODE_ENV=development node ./bin/build.js",
     "build": "cross-env NODE_ENV=production node ./bin/build.js",
