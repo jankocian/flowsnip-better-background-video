@@ -27,7 +27,7 @@ Also, it often takes a while before the video playback, causing a "jumpy" feelin
 `Site settings` > `Custom Code` > `Head code`
 
 ```
-<script src="https://cdn.jsdelivr.net/npm/flowsnip–better-background-video@1.0.0/dist/flowsnip–better-background-video.min.js" async></script>
+<script src="https://cdn.jsdelivr.net/npm/@jankocian/flowsnip-better-background-video@1.1.2" async></script>
 ```
 
 ### Basic Usage
