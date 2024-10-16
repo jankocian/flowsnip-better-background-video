@@ -22,23 +22,31 @@ const generatePackageJsonPlugin = () => {
   return {
     name: 'generate-dist-package-json',
     setup(build) {
-      build.onEnd(() => {
+      build.onEnd(async () => {
         const __dirname = path.dirname(fileURLToPath(import.meta.url));
         const rootDir = path.resolve(__dirname, '..');
         const distDir = path.join(rootDir, BUILD_DIRECTORY);
 
-        // You will need to find a way to import or read your package.json since `require` is not available in ES modules
-        const packageJson = JSON.parse(fs.readFileSync(path.join(rootDir, 'package.json')));
+        try {
+          const packageJsonContent = await fs.readFile(path.join(rootDir, 'package.json'), 'utf-8');
+          const packageJson = JSON.parse(packageJsonContent);
 
-        // Modify the package.json as needed
-        delete packageJson.scripts;
-        delete packageJson.devDependencies;
-        delete packageJson.files;
-        delete packageJson.publishConfig;
-        packageJson.browser = 'index.js'; // Update as per your entry file
+          // Modify the package.json as needed
+          delete packageJson.scripts;
+          delete packageJson.devDependencies;
+          delete packageJson.files;
+          delete packageJson.publishConfig;
+          packageJson.browser = 'index.js'; // Update as per your entry file
 
-        // Write the modified package.json to the dist directory
-        fs.writeFileSync(path.join(distDir, 'package.json'), JSON.stringify(packageJson, null, 2));
+          // Write the modified package.json to the dist directory
+          await fs.writeFile(
+            path.join(distDir, 'package.json'),
+            JSON.stringify(packageJson, null, 2)
+          );
+          console.log('package.json generated in dist directory');
+        } catch (error) {
+          console.error('Error generating package.json:', error);
+        }
       });
     },
   };
